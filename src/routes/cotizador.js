@@ -102,8 +102,8 @@ const Cordon = require('../models/Cordon');
 //#region Cordon
 
 router.post('/crearCordon', async (req,res) => {
-    const {nombreConfeccion,costoConfeccion} = req.body;
-    const newCordon = new Cordon({ nombreConfeccion,costoConfeccion});
+    const {nombreCordon,largoRollo,valorRollo,valorMetro} = req.body;
+    const newCordon = new Cordon({ nombreCordon,largoRollo,valorRollo,valorMetro});
     await newCordon.save();
 
     res.status(200).json(newCordon)
