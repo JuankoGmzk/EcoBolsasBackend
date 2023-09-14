@@ -41,7 +41,7 @@ router.post('/CrearCotizacion', async (req, res) => {
         return res.status(200).json(objResp);
     }
     catch (error) {
-        
+
         const objResp = {
             respCotizacion: null,
             resp: false,
@@ -52,7 +52,7 @@ router.post('/CrearCotizacion', async (req, res) => {
     }
 
 
-   
+
 
 });
 
@@ -67,9 +67,10 @@ router.post('/crearMaterial', async (req, res) => {
         largo_m = elemento.largo_m;
         ancho_m = elemento.ancho_m;
         grm_m2 = elemento.grm_m2;
+        Mtr_Detal = elemento.Mtr_Detal
         costo_sinIva_Rollo = elemento.costo_sinIva_Rollo;
 
-        const newTask = new Material({ nombreMaterial, material, largo_m, ancho_m, grm_m2, costo_sinIva_Rollo });
+        const newTask = new Material({ nombreMaterial, material, largo_m, ancho_m, grm_m2, Mtr_Detal, costo_sinIva_Rollo });
 
         await newTask.save();
 
@@ -81,7 +82,17 @@ router.post('/crearMaterial', async (req, res) => {
 router.get('/AllMateriales', (req, res) => {
 
     Material.find().then((result) => {
-        res.send(result)
+
+        const materialesConParametros = result.map((material) => {
+            const strResultMtrXRollo = Math.ceil(parseInt(material.costo_sinIva_Rollo) / parseInt(material.largo_m))
+            const strResultMtrXRolloDetal = Math.ceil(strResultMtrXRollo * parseFloat(material.Mtr_Detal))
+            return {
+                ...material.toObject(),
+                resultMtrXRollo: strResultMtrXRollo,
+                resultMtrXRolloDetal: strResultMtrXRolloDetal,
+            };
+        });
+        res.send(materialesConParametros)
     }).catch((err) => {
         console.log(err)
     });
@@ -313,8 +324,8 @@ router.post('/Cotizar', async (req, res) => {
 
     //#endregion Calculo de cortes H|V
 
-    if(Fuelle.length != 0){
-        SobranteFuelleCompletoH= CalcularSobranteFuelleComleto(MetrosRequeridosH, Fuelle, Alto, SobranteH, TotalUnidades)
+    if (Fuelle.length != 0) {
+        SobranteFuelleCompletoH = CalcularSobranteFuelleComleto(MetrosRequeridosH, Fuelle, Alto, SobranteH, TotalUnidades)
         SobranteFuelleCompletoV = CalcularSobranteFuelleComleto(MetrosRequeridosV, Fuelle, Alto, SobranteV, TotalUnidades, true)
     }
 
@@ -329,30 +340,30 @@ router.post('/Cotizar', async (req, res) => {
 
 
     CortesPorRollo = MetrosRequeridosH;
-    RollosRequeridos = redondearAlDecimo(MinimoValorMetros/parseInt(consultaMaterial.largo_m))
+    RollosRequeridos = redondearAlDecimo(MinimoValorMetros / parseInt(consultaMaterial.largo_m))
 
     //#region  ValoresFinales
 
-    const ValorSubtotalMaterial = Math.ceil(parseInt(consultaMaterial.costo_sinIva_Rollo)*RollosRequeridos);
-    const IvaMaterial = Math.ceil(ValorSubtotalMaterial*0.19);
+    const ValorSubtotalMaterial = Math.ceil(parseInt(consultaMaterial.costo_sinIva_Rollo) * RollosRequeridos);
+    const IvaMaterial = Math.ceil(ValorSubtotalMaterial * 0.19);
     const ValorTransporte = 50000;
-    const ValorFinalMaterial = parseInt(ValorSubtotalMaterial+IvaMaterial+ValorTransporte);
-    
+    const ValorFinalMaterial = parseInt(ValorSubtotalMaterial + IvaMaterial + ValorTransporte);
 
-    const ValorFinalConfeccion = parseInt(consultaConfeccion.costoConfeccion)*TotalUnidades;
-    const ValorFinalCorte = 50000*RollosRequeridos;
-    const TotalResumenCostos = ValorFinalMaterial+ValorFinalConfeccion+ValorFinalCorte;
-    const ValorPorBolsa = Math.ceil(TotalResumenCostos/parseInt(UnidadesRequeridas));
+
+    const ValorFinalConfeccion = parseInt(consultaConfeccion.costoConfeccion) * TotalUnidades;
+    const ValorFinalCorte = 50000 * RollosRequeridos;
+    const TotalResumenCostos = ValorFinalMaterial + ValorFinalConfeccion + ValorFinalCorte;
+    const ValorPorBolsa = Math.ceil(TotalResumenCostos / parseInt(UnidadesRequeridas));
 
     const objResumenCostos = {
-        PTMaterial : ValorFinalMaterial,
-        PTConfeccion : ValorFinalConfeccion,
-        PTCorte : ValorFinalCorte,
-        PTImpresion : null,
-        PTAccesorios : null,
-        PTOtros : null,
-        SumaTotalCostos : TotalResumenCostos,
-        ValorPorBolsa : ValorPorBolsa
+        PTMaterial: ValorFinalMaterial,
+        PTConfeccion: ValorFinalConfeccion,
+        PTCorte: ValorFinalCorte,
+        PTImpresion: null,
+        PTAccesorios: null,
+        PTOtros: null,
+        SumaTotalCostos: TotalResumenCostos,
+        ValorPorBolsa: ValorPorBolsa
     }
 
     //#endregion ValoresFinales
@@ -361,36 +372,66 @@ router.post('/Cotizar', async (req, res) => {
 
     let Ajuste = 20;
     let AjusteSumaPorcentaje = (parseInt(ValorPorBolsa) * Ajuste) / 100;
-    const PrecioVentaUnitarioSinIVA =   Math.ceil(ValorPorBolsa+AjusteSumaPorcentaje);
-    const PrecioVentaTotalSinIVA = PrecioVentaUnitarioSinIVA*parseInt(UnidadesRequeridas);
- 
-    const PrecioVentaUnitariaMasIVA = Math.ceil(PrecioVentaUnitarioSinIVA*0.19);
-    const PrecioVentaTotalMasIVA = Math.ceil(PrecioVentaTotalSinIVA*0.19);
+    const PrecioVentaUnitarioSinIVA = Math.ceil(ValorPorBolsa + AjusteSumaPorcentaje);
+    const PrecioVentaTotalSinIVA = PrecioVentaUnitarioSinIVA * parseInt(UnidadesRequeridas);
 
-    const TotalVentaBolsaUnitaria =  Math.ceil(PrecioVentaUnitarioSinIVA+PrecioVentaUnitariaMasIVA);
-    const TotalVentaBolsas = Math.ceil(PrecioVentaTotalSinIVA+PrecioVentaTotalMasIVA);
+    const PrecioVentaUnitariaMasIVA = Math.ceil(PrecioVentaUnitarioSinIVA * 0.19);
+    const PrecioVentaTotalMasIVA = Math.ceil(PrecioVentaTotalSinIVA * 0.19);
+
+    const TotalVentaBolsaUnitaria = Math.ceil(PrecioVentaUnitarioSinIVA + PrecioVentaUnitariaMasIVA);
+    const TotalVentaBolsas = Math.ceil(PrecioVentaTotalSinIVA + PrecioVentaTotalMasIVA);
 
 
     const objPrecioVenta = {
-        PVSinIvaUnitario : PrecioVentaUnitarioSinIVA,
-        PVSinIvaTotal : PrecioVentaTotalSinIVA,
-        PVConIvaUnitario : TotalVentaBolsaUnitaria,
-        PVConIvaTotal : TotalVentaBolsas,
-        IVA19Unitario : PrecioVentaUnitariaMasIVA,
-        IVA19Total : PrecioVentaTotalMasIVA
+        PVSinIvaUnitario: PrecioVentaUnitarioSinIVA,
+        PVSinIvaTotal: PrecioVentaTotalSinIVA,
+        PVConIvaUnitario: TotalVentaBolsaUnitaria,
+        PVConIvaTotal: TotalVentaBolsas,
+        IVA19Unitario: PrecioVentaUnitariaMasIVA,
+        IVA19Total: PrecioVentaTotalMasIVA
     }
 
     const objResp = {
-        message : "Datos guardados exitosamente",
-        resp : true,
-        rutaImagen : RutaImagen,
-        PreciosVenta : objPrecioVenta,
-        ResumenCosto : objResumenCostos
+        message: "Datos guardados exitosamente",
+        resp: true,
+        rutaImagen: RutaImagen,
+        PreciosVenta: objPrecioVenta,
+        ResumenCosto: objResumenCostos
     };
 
     //#endregion PrecioVenta
 
     return res.status(200).json(objResp);
+});
+
+router.post('/GenerarOT', async (req,res) => {
+
+    const Cotizador = require('../models/Cotizaciones');
+    const {_idCotizacion} = req.body;
+
+    Cotizador.updateOne(
+        { _id: _idCotizacion},
+        {
+            $set: {
+                _EstadoCotizacion: 'OT'
+            }
+        },
+        (err, result) => {
+            if (err) throw err;
+            console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
+            res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
+        }
+    );
+
+});
+
+router.get('/ObtenerOtActivas', (req, res) =>{
+    console.log("Estas llamando esto?")
+    Cotizador.find({ _EstadoCotizacion : 'OT' }).then((result) => {
+        res.send(result)
+    }).catch((err) => {
+        console.log(err)
+    });
 });
 
 //MetrosRequeridosAncho:MR
@@ -433,7 +474,6 @@ function CalcularSobranteFuelleComleto(strMR, strAF, strAB, strS, intTotalUnidad
     return MetrosRequeridos;
 }
 
-
 function CalcularAsas(strLA, strTU, strAR) {
     const AnchoAsas = 6;
     const LonAsasBolsa = parseInt(strLA) * 2;
@@ -446,8 +486,91 @@ function CalcularAsas(strLA, strTU, strAR) {
 
 function redondearAlDecimo(numero) {
     return Math.ceil(numero * 10) / 10;
-  }
+}
 
 //#endregion Cotizador
+
+//#region MisSolicitudes
+
+
+router.post('/MisCotizaciones', (req, res) => {
+    const { idUser, statusCotizacion } = req.body;
+
+    Cotizador.find({ _IdUsuario: idUser, _EstadoCotizacion: statusCotizacion }).then((result) => {
+        res.status(200).json(result)
+
+    }).catch((err) => {
+        console.log(err)
+    });
+});
+
+router.post('/DetalleCotizacion', async (req, res) => {
+
+    const { IdSolicitud } = req.body;
+
+    const consultaDetalleCotizacion = await Cotizador.findById(IdSolicitud);
+
+    res.status(200).json(consultaDetalleCotizacion)
+
+});
+
+router.post('/ActualizarMiCotizacion', (req, res) => {
+
+    const { _idCotizacion, NombreEmpresa, NombreContacto, Identificacion, TelContacto,
+        Email, FechaEntrega, Ciudad, DireccionEntrega,
+        TipoCogedera, TipoBolsa, UnidadesRequeridas, Ancho_cm,
+        Alto_cm, Fuelle_cm, Asas_cm, Material, Color, Estampado,
+        Caras, NumeroTintas, ColorTintas, ValorBolsa, Utilidad, PVSinIvaUnitario, PVSinIvaTotal,
+        PVConIvaUnitario, PVConIvaTotal, NombreUsuario, _IdUsuario, _EstadoCotizacion, CheckCliente, CheckDineroCliente
+    } = req.body;
+
+    Cotizaciones.updateOne(
+        { _id: _idCotizacion },
+        {
+            $set: {
+                NombreEmpresa: NombreEmpresa,
+                NombreContacto: NombreContacto,
+                Identificacion: Identificacion,
+                TelContacto: TelContacto,
+                Email: Email,
+                FechaEntrega: FechaEntrega,
+                Ciudad: Ciudad,
+                DireccionEntrega: DireccionEntrega,
+                TipoCogedera: TipoCogedera,
+                TipoBolsa: TipoBolsa,
+                UnidadesRequeridas: UnidadesRequeridas,
+                Ancho_cm: Ancho_cm,
+                Alto_cm: Alto_cm,
+                Fuelle_cm: Fuelle_cm,
+                Asas_cm: Asas_cm,
+                Material: Material,
+                Color: Color,
+                Estampado: Estampado,
+                Caras: Caras,
+                NumeroTintas: NumeroTintas,
+                ColorTintas: ColorTintas,
+                ValorBolsa: ValorBolsa,
+                Utilidad: Utilidad,
+                PVSinIvaUnitario: PVSinIvaUnitario,
+                PVSinIvaTotal: PVSinIvaTotal,
+                PVConIvaUnitario: PVConIvaUnitario,
+                PVConIvaTotal: PVConIvaTotal,
+                _EstadoCotizacion: _EstadoCotizacion,
+                CheckCliente: CheckCliente,
+                CheckDineroCliente: CheckDineroCliente
+
+            }
+        },
+        (err, result) => {
+            if (err) throw err;
+            console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
+            res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
+        }
+    );
+});
+
+
+//#endregion MisSolicitudes
+
 
 module.exports = router;
