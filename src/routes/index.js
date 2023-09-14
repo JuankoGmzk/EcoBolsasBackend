@@ -5,7 +5,7 @@ const User = require('../models/User');
 const Task = require('../models/Task');
 const PrivateTask = require('../models/PrivateTask');
 
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken'); 
 
 router.get('/index', (req, res) => {
     console.log("index?")
@@ -48,6 +48,14 @@ router.post('/signin', async (req, res) => {
     };
 
     return res.status(200).json({ token, dataUser });
+});
+
+router.get('/AllUsers', verifyToken, (req,res)=> {
+    User.find().then((result) => {
+        res.send(result)
+    }).catch((err) => {
+        console.log(err)
+    });
 });
 
 router.get('/tasks', (req, res) => {
