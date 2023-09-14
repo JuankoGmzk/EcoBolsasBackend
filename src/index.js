@@ -14,7 +14,7 @@ app.use(cors());
 
 // routes
 app.use('/api', require('./routes/index'));
-app.use('/pdf', require('./routes/generate_pdf'));   
+app.use('/pdf', require('./routes/generate_pdf'));
 app.use('/cotizador', require('./routes/cotizador'));
 
 const server = app.listen(app.get('port'), () => {
@@ -23,10 +23,10 @@ const server = app.listen(app.get('port'), () => {
 
 
 //WebSockets
-const io = require('socket.io')(server,{
+const io = require('socket.io')(server, {
     cors: {
         origins: ['http://localhost:4200']
-      }
+    }
 });
 
 // io.on('connection',(socket) => {
@@ -41,13 +41,17 @@ const io = require('socket.io')(server,{
 
 io.on('connection', (socket) => {
     const idHandShake = socket.id;
-    console.log('a user connected',idHandShake);
+    console.log('a user connected', idHandShake);
     socket.on('disconnect', () => {
-      console.log('user disconnected',idHandShake);
+        console.log('user disconnected', idHandShake);
     });
 
     socket.on('chat:message', (data) => {
-        io.emit('evento',data);
+        io.emit('evento', data);
+    });
+
+    socket.on('oTsGeneradasBack', (data) => {
+        io.emit('oTsGeneradas',data);
     });
 
 
@@ -57,6 +61,6 @@ io.on('connection', (socket) => {
 
     })
 
-    
 
-  });
+
+});
