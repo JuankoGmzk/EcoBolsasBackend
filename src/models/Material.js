@@ -6,6 +6,7 @@ const materialSchema = new Schema({
     largo_m: Number,
     ancho_m : Number, 
     grm_m2: String,
+    Mtr_Detal: String,
     costo_sinIva_Rollo: Number
 }, {
     timestamps: true
