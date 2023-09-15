@@ -13,9 +13,8 @@ router.get('/index', (req, res) => {
 });
 
 router.post('/signup', async (req, res) => {
-    const { primerNombre, segundoNombre, primerApellido, segundoApellido, cedula, cargo, edad, fechaNacimiento, esPLanta, genero, user, password } = req.body;
-    console.log(user, " and ", password)
-    const newUser = new User({ primerNombre, segundoNombre, primerApellido, segundoApellido, cedula, cargo, edad, fechaNacimiento, esPLanta, genero, user, password });
+    const { primerNombre, segundoNombre, primerApellido, segundoApellido, cedula, cargo,rol, edad, fechaNacimiento, esPLanta, genero, user, password } = req.body;
+    const newUser = new User({ primerNombre, segundoNombre, primerApellido, segundoApellido, cedula, cargo,rol, edad, fechaNacimiento, esPLanta, genero, user, password });
     await newUser.save();
     const token = await jwt.sign({ _id: newUser._id }, 'secretkey');
     res.status(200).json({ token });
@@ -29,8 +28,9 @@ router.post('/signin', async (req, res) => {
     const criterioBusqueda = { user:email}; 
 
     const userFind = await User.find(criterioBusqueda);
+
     if (userFind.length == 0) return res.status(401).send('The user doen\' exists');
-   
+
     if (userFind[0].password !== password) return res.status(401).send('Contraseña incorrecta');
    
     const token = jwt.sign({ _id: userFind._id }, 'secretkey');
@@ -39,9 +39,11 @@ router.post('/signin', async (req, res) => {
         primerNombre:userFind[0].primerNombre,
         segundoNombre:userFind[0].segundoNombre,
         primerApellido:userFind[0].primerApellido,
+        segundoApellido:userFind[0].segundoApellido,
         cedula:userFind[0].cedula,
         edad:userFind[0].edad,
         cargo:userFind[0].cargo,
+        rol:userFind[0].rol,
         genero:userFind[0].genero,
         user:userFind[0].user,
         idUser:userFind[0]._id
