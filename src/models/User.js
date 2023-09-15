@@ -8,7 +8,8 @@ const userSchema = new Schema({
     cedula: String,
     edad: String,
     cargo: String,
-    esPlanta: String,
+    rol:String,
+    esPlanta: Boolean,
     genero : String,
     user: String,
     password : String
