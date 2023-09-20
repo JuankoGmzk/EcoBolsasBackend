@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const Material = require('../models/Material');
 const Cotizador = require('../models/Cotizaciones');
-
+const HistoricoMateriales = require('../models/HistoricoMateriales');
 
 router.post('/CrearCotizacion', async (req, res) => {
 
@@ -18,8 +18,6 @@ router.post('/CrearCotizacion', async (req, res) => {
             Caras, NumeroTintas, ColorTintas, ValorBolsa, Utilidad, PVSinIvaUnitario, PVSinIvaTotal,
             PVConIvaUnitario, PVConIvaTotal, NombreUsuario, _IdUsuario, _EstadoCotizacion, CheckCliente, CheckDineroCliente
         } = req.body;
-
-        console.log("CrearCotizacion", req.body)
 
         const newCotizacion = new Cotizaciones({
             NombreEmpresa, NombreContacto, Identificacion, TelContacto,
@@ -56,6 +54,8 @@ router.post('/CrearCotizacion', async (req, res) => {
 
 });
 
+
+//#region Material
 router.post('/crearMaterial', async (req, res) => {
 
     for (let i = 0; i < req.body.length; i++) {
@@ -90,6 +90,7 @@ router.get('/AllMateriales', (req, res) => {
                 ...material.toObject(),
                 resultMtrXRollo: strResultMtrXRollo,
                 resultMtrXRolloDetal: strResultMtrXRolloDetal,
+                costoAnterior:material.costo_sinIva_Rollo
             };
         });
         res.send(materialesConParametros)
@@ -108,8 +109,9 @@ router.post('/MaterialById', (req, res) => {
 });
 router.put('/actualizarMaterial', (req, res) => {
 
-    const { _id, nombreMaterial, material, largo_m, ancho_m, grm_m2, costo_sinIva_Rollo } = req.body;
+    const { _id, nombreMaterial, material, largo_m, ancho_m, grm_m2, costo_sinIva_Rollo, costoAnterior, nombreAsesor } = req.body;
 
+    console.log("req.body ",req.body)
     Material.updateOne(
         { _id: _id },
         {
@@ -122,14 +124,20 @@ router.put('/actualizarMaterial', (req, res) => {
                 costo_sinIva_Rollo: costo_sinIva_Rollo
             }
         },
-        (err, result) => {
+        async (err, result) => {
             if (err) throw err;
             console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
+
+            const newHistorico = new HistoricoMateriales({ _id, costo_sinIva_Rollo,costoAnterior,nombreAsesor});
+
+            await newHistorico.save();
+
             res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
         }
     );
 
 });
+//#endregion Material
 
 const Impresion = require('../models/Impresion');
 //#region Impresion 
@@ -158,6 +166,27 @@ router.post('/ImpresionById', (req, res) => {
     }).catch((err) => {
         console.log(err)
     });
+});
+
+router.put('/actualizarImpresion', (req, res) => {
+
+    const { _id, nombreImpresion, costoImpresion } = req.body;
+
+    Impresion.updateOne(
+        { _id: _id },
+        {
+            $set: {
+                nombreImpresion: nombreImpresion,
+                costoImpresion: costoImpresion
+            }
+        },
+        (err, result) => {
+            if (err) throw err;
+            console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
+            res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
+        }
+    );
+
 });
 
 //#endregion Impresion
@@ -195,6 +224,27 @@ router.post('/ConfeccionById', (req, res) => {
     });
 });
 
+router.put('/actualizarConfeccion', (req, res) => {
+
+    const { _id, nombreConfeccion, costoConfeccion } = req.body;
+
+    Confeccion.updateOne(
+        { _id: _id },
+        {
+            $set: {
+                nombreConfeccion: nombreConfeccion,
+                costoConfeccion: costoConfeccion
+            }
+        },
+        (err, result) => {
+            if (err) throw err;
+            console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
+            res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
+        }
+    );
+
+});
+
 //#endregion Confeccion
 
 const Cordon = require('../models/Cordon');
@@ -216,6 +266,30 @@ router.get('/AllCordones', (req, res) => {
         console.log(err)
     });
 });
+
+router.put('/actualizarCordon', (req, res) => {
+
+    const { _id, nombreCordon, largoRollo, valorRollo, valorMetro } = req.body;
+
+    Cordon.updateOne(
+        { _id: _id },
+        {
+            $set: {
+                nombreCordon: nombreCordon,
+                largoRollo: largoRollo,
+                valorRollo: valorRollo,
+                valorMetro: valorMetro
+            }
+        },
+        (err, result) => {
+            if (err) throw err;
+            console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
+            res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
+        }
+    );
+
+});
+
 
 //#endregion Cordon
 
@@ -250,6 +324,27 @@ router.post('/CogederaById', (req, res) => {
     });
 });
 
+router.put('/actualizarCogedera', (req, res) => {
+
+    const { _id, nombreCogedera, costoCogedera } = req.body;
+
+    Cogedera.updateOne(
+        { _id: _id },
+        {
+            $set: {
+                nombreCogedera: nombreCogedera,
+                costoCogedera: costoCogedera
+            }
+        },
+        (err, result) => {
+            if (err) throw err;
+            console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
+            res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
+        }
+    );
+
+});
+
 //#endregion Cogedera
 
 
@@ -261,7 +356,7 @@ router.post('/Cotizar', async (req, res) => {
     const ConfeccionMongoose = require('../models/Confeccion');
     const CogederaMongoose = require('../models/Cogedera');
 
-    const { TipoCogedera, TipoBolsa, UnidadesRequeridas, Ancho, Alto, Fuelle, Asas, Material, Color, Estampado, Caras, NumeroTintas, ColorTintas } = req.body;
+    const { TipoCogedera, TipoBolsa, UnidadesRequeridas, Ancho, Alto, Fuelle, Asas, Material, Color, Estampado, Caras, NumeroTintas, ColorTintas, AjusteCot } = req.body;
     const consultaMaterial = await MaterialMongoose.findById(Material);
 
     const consultaImpresion = await ImpresionMongoose.findById(Estampado);
@@ -272,19 +367,19 @@ router.post('/Cotizar', async (req, res) => {
     const consultaCogedera = await CogederaMongoose.findById(cogederaTroquelid);
 
     if (consultaMaterial == null) {
-        console.log("acá devemos devoler el error ")
+        console.log(" consultaMaterial acá devemos devoler el error ")
     }
 
     if (consultaImpresion == null) {
-        console.log("acá devemos devoler el error ")
+        console.log(" consultaImpresion acá devemos devoler el error ")
     }
 
     if (consultaConfeccion == null) {
-        console.log("acá devemos devoler el error ")
+        console.log(" consultaConfeccion acá devemos devoler el error ")
     }
 
     if (consultaCogedera == null) {
-        console.log("acá devemos devoler el error ")
+        console.log(" consultaCogedera acá devemos devoler el error ")
     }
 
     consultaMaterial.ancho_m = consultaMaterial.ancho_m * 100;
@@ -370,7 +465,7 @@ router.post('/Cotizar', async (req, res) => {
 
     //#region  PrecioVenta
 
-    let Ajuste = 20;
+    let Ajuste = parseInt(AjusteCot);
     let AjusteSumaPorcentaje = (parseInt(ValorPorBolsa) * Ajuste) / 100;
     const PrecioVentaUnitarioSinIVA = Math.ceil(ValorPorBolsa + AjusteSumaPorcentaje);
     const PrecioVentaTotalSinIVA = PrecioVentaUnitarioSinIVA * parseInt(UnidadesRequeridas);
@@ -404,13 +499,13 @@ router.post('/Cotizar', async (req, res) => {
     return res.status(200).json(objResp);
 });
 
-router.post('/GenerarOT', async (req,res) => {
+router.post('/GenerarOT', async (req, res) => {
 
     const Cotizador = require('../models/Cotizaciones');
-    const {_idCotizacion} = req.body;
+    const { _idCotizacion } = req.body;
 
     Cotizador.updateOne(
-        { _id: _idCotizacion},
+        { _id: _idCotizacion },
         {
             $set: {
                 _EstadoCotizacion: 'OT'
@@ -425,9 +520,8 @@ router.post('/GenerarOT', async (req,res) => {
 
 });
 
-router.get('/ObtenerOtActivas', (req, res) =>{
-    console.log("Estas llamando esto?")
-    Cotizador.find({ _EstadoCotizacion : 'OT' }).then((result) => {
+router.get('/ObtenerOtActivas', (req, res) => {
+    Cotizador.find({ _EstadoCotizacion: 'OT' }).then((result) => {
         res.send(result)
     }).catch((err) => {
         console.log(err)
