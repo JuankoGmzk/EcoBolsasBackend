@@ -90,7 +90,7 @@ router.get('/AllMateriales', (req, res) => {
                 ...material.toObject(),
                 resultMtrXRollo: strResultMtrXRollo,
                 resultMtrXRolloDetal: strResultMtrXRolloDetal,
-                costoAnterior:material.costo_sinIva_Rollo
+                costoAnteriorFront:material.costo_sinIva_Rollo
             };
         });
         res.send(materialesConParametros)
@@ -109,7 +109,7 @@ router.post('/MaterialById', (req, res) => {
 });
 router.put('/actualizarMaterial', (req, res) => {
 
-    const { _id, nombreMaterial, material, largo_m, ancho_m, grm_m2, costo_sinIva_Rollo, costoAnterior, nombreAsesor } = req.body;
+    const { _id, nombreMaterial, material, largo_m, ancho_m, grm_m2, costo_sinIva_Rollo, costoAnteriorFront, nombreAsesor } = req.body;
 
     console.log("req.body ",req.body)
     Material.updateOne(
@@ -128,9 +128,21 @@ router.put('/actualizarMaterial', (req, res) => {
             if (err) throw err;
             console.log(`${result.modifiedCount} registro(s) actualizado(s)`);
 
-            const newHistorico = new HistoricoMateriales({ _id, costo_sinIva_Rollo,costoAnterior,nombreAsesor});
+            if(costoAnteriorFront != costo_sinIva_Rollo){
 
-            await newHistorico.save();
+                
+                const _idMaterial = _id;
+                const costoAnterior = costoAnteriorFront;
+                const costoNuevo = costo_sinIva_Rollo;
+                const nombreAsesorCambio = 'JuanBer';
+
+                console.log(_idMaterial, costoAnterior,costoNuevo,nombreAsesorCambio);
+
+
+                const newHistorico = new HistoricoMateriales({ _idMaterial, costoAnterior, costoNuevo, nombreAsesorCambio});
+ 
+                await newHistorico.save();
+            }
 
             res.status(201).json(`${result.modifiedCount} registro(s) actualizado(s)`);
         }
