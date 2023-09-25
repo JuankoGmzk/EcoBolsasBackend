@@ -11,72 +11,126 @@ app.use(express.static(__dirname + '/public'));
 
 const nombreDeUsuario = __dirname+"/public"+"/img/patronHojas.png";
 const content = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden de Trabajo</title>
+    <style>
+        /* Estilo para el marco de líneas */
+        .marco {
+            border: 2px solid black;
+            padding: 20px;
+            margin: 20px;
+        }
 
-<h1>Título en el PDF creado con el paquete html-pdf</h1>
-<p>Generando un PDF con un HTML sencillo</p>
+        /* Estilo para los separadores */
+       .separador {
+            width: 100%;
+            border: 1px solid black;
+            margin-left: -5px; /* Ajusta el margen izquierdo para tocar las líneas laterales del marco */
+            margin-right: -15px; /* Ajusta el margen derecho para tocar las líneas laterales del marco */
+        }
 
-<div class="w3-col m6 w3-padding-large">
-      <h1 class="w3-center">About Catering</h1><br>
-      <h5 class="w3-center">Tradition since 1889</h5>
-      <p class="w3-large">The Catering was founded in blabla by Mr. Smith in lorem ipsum dolor sit amet, consectetur adipiscing elit consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute iruredolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.We only use <span class="w3-tag w3-light-grey">seasonal</span> ingredients.</p>
-      <p class="w3-large w3-text-grey w3-hide-medium">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod temporincididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+        /* Estilos para el encabezado */
+        .encabezado {
+            text-align: center;
+            font-size: 20px;
+        }
+
+        /* Estilos para la información de la empresa */
+        .info-empresa {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para la sección de detalles del pedido */
+        .detalle-pedido {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para la sección de nota importante */
+        .nota-importante {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para la sección de observaciones */
+        .observaciones {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para la sección de forma de pago */
+        .forma-pago {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="marco">
+   
+        <div class="imagenes">
+            <p>AcrearPublicidad</p>
+            <p>Ecobolsas</p>
+        </div>
+        <hr class="separador">
+           <hr class="separador">
+          
+          <div class="encabezado">
+            <p>EMPRESA LAURA GUERRERO</p>
+            <p>Fecha 31/ago/2023</p>
+            <p>NIT. / C.C. 0</p>
+        </div>
+        <div class="info-empresa">
+            <p>DIRECCION CRA 75 D # 2 B SUR 320</p>
+            <p>CONTACTO</p>
+            <p>CIUDAD MEDELLIN</p>
+            <p>TELEFONO</p>
+            <p>E-MAIL 0</p>
+        </div>
+        <div class="detalle-pedido">
+            <p>FECHA DE ENTREGA 1 de septiembre de 2023</p>
+            <p>ASESOR</p>
+            <p>MATERIAL: Lienzo - gr</p>
+            <p>DISEÑO: Fuelle Completo</p>
+            <p>COGEDERA: Asas - 53 cm</p>
+            <p>COLOR: CRUDO NATURAL</p>
+            <p>MEDIDAS: 40 Alto X 35 Ancho X 15 Fuelle</p>
+            <p>MARCACIÓN: Policromia - 1 cara(s) - tinta(s)</p>
+            <p>COLOR TINTAS 0</p>
+            <p>CANTIDAD 100</p>
+            <p>VALOR UNITARIO $ 11.200</p>
+            <p>SUBTOTAL $ 1.120.000</p>
+            <p>IVA 19% $ 212.800</p>
+        </div>
+        <hr class="separador">
+        <div class="nota-importante">
+            <p>NOTA IMPORTANTE:</p>
+            <ol>
+                <li>Con la firma de este, el cliente autoriza el diseño de la bolsa, diseño de arte, color de estampación y valor total.</li>
+                <li>El valor del envío es asumido por el cliente.</li>
+                <li>Por favor, envíe la correspondencia relacionada con esta orden de trabajo a: ventas@ecobolsas.co</li>
+                <li>En toda su correspondencia, por favor refiérase a la O.T./ Orden de Trabajo No. No. 230831-7082</li>
+            </ol>
+        </div>
+        <hr class="separador">
+        <div class="forma-pago">
+            <p>Autorizado / Recibe : Fecha: 31/ago/2023</p>
+            <p>ENTIDADES BANCARIAS - El pago se puede realizar en:</p>
+            <p>OBSERVACIONES</p>
+            <p>Jennifer de Agrella</p>
+            <p>Cada pequeño paso hace una gran diferencia para salvar el medio ambiente.</p>
+            <p>FORMA DE PAGO: $940.000 - (70%) para iniciar la producción / $392.800 - (30%) antes del despacho</p>
+            <p>COTIZACIÓN / OT</p>
+        </div>
     </div>
-  </div>
-
-
-
-  <table BORDER>
-  <tr>
-    <td>
-      <!-- Columna izquierda con celdas -->
-      <table>
-        <TH COLSPAN=2>ESPECIFICACIONES DEL PRODUCTO</TH>
-        <tr>
-          <td>Material</td>
-          <td style="text-align: right;">Kambrel - 70 gr</td>
-        </tr>
-        
-        <tr>
-          <td>TIPO BOLSA:</td>
-          <td style="text-align: right;">Fuelle Completo</td>
-        </tr>
-        <tr>
-          <td>COGEDERA:</td>
-          <td style="text-align: right;">Asas</td>
-        </tr>
-        <tr>
-          <td>COLOR TELA:</td>
-          <td style="text-align: right;">NEGRAS</td>
-        </tr>
-        <tr>
-          <td>MEDIDAS: </td>
-          <td style="text-align: right;">50cm Alto X 50cm Ancho X 10cm Fuelle</td>
-        </tr>
-        <tr>
-          <td>MARCACIÓN: :</td>
-          <td style="text-align: right;">Tinta Plana - 1 cara(s) - 1 tinta(s)</td>
-        </tr>
-        <tr>
-          <td>COLOR TINTAS</td>
-          <td style="text-align: right;">ROJO</td>
-        </tr>
-        <tr>
-          <td>CANTIDAD</td>
-          <td style="text-align: right;">100</td>
-        </tr>
-      </table>
-    </td>
-    <td>
-      <TH COLSPAN=2>IMAGEN</TH>
-      <!-- Columna derecha con imagen -->
-      <h1>Bienvenido, ${nombreDeUsuario}!</h1>
-      <img src="${nombreDeUsuario}.png" alt="Descripción de la imagen">
-
-      <img src="/img/patronHojas.png" alt="Logo de mi sitio web">
-
-    </td>
-  </tr>
-</table>
+</body>
+</html>
 
 `;
 
