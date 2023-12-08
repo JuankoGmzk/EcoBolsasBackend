@@ -12,4 +12,4 @@ const materialSchema = new Schema({
     timestamps: true
 });
 
-module.exports = model('material', materialSchema);
+module.exports = model('materials', materialSchema);
