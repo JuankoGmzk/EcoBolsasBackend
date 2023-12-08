@@ -19,6 +19,11 @@ app.use('/cotizador', require('./routes/cotizador'));
 
 const server = app.listen(app.get('port'), () => {
     console.log('Server on port', app.get('port'));
+
+     // Obtener la dirección IP del servidor (puede variar según el entorno de despliegue)
+     const address = server.address();
+     const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + address.port;
+     console.log("servidor:", bind)
 });
 
 
