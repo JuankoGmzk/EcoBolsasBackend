@@ -6,55 +6,6 @@ const Material = require('../models/Material');
 const Cotizador = require('../models/Cotizaciones');
 const HistoricoMateriales = require('../models/HistoricoMateriales');
 
-router.post('/CrearCotizacion', async (req, res) => {
-
-
-    try {
-
-        const { NombreEmpresa, NombreContacto, Identificacion, TelContacto,
-            Email, FechaEntrega, Ciudad, DireccionEntrega,
-            TipoCogedera, TipoBolsa, UnidadesRequeridas, Ancho_cm,
-            Alto_cm, Fuelle_cm, Asas_cm, Material, Color, Estampado,
-            Caras, NumeroTintas, ColorTintas, ValorBolsa, Utilidad, PVSinIvaUnitario, PVSinIvaTotal,
-            PVConIvaUnitario, PVConIvaTotal, NombreUsuario, _IdUsuario, _EstadoCotizacion, CheckCliente, CheckDineroCliente
-        } = req.body;
-
-        const newCotizacion = new Cotizaciones({
-            NombreEmpresa, NombreContacto, Identificacion, TelContacto,
-            Email, FechaEntrega, Ciudad, DireccionEntrega,
-            TipoCogedera, TipoBolsa, UnidadesRequeridas, Ancho_cm,
-            Alto_cm, Fuelle_cm, Asas_cm, Material, Color, Estampado,
-            Caras, NumeroTintas, ColorTintas, ValorBolsa, Utilidad, PVSinIvaUnitario, PVSinIvaTotal,
-            PVConIvaUnitario, PVConIvaTotal, NombreUsuario, _IdUsuario, _EstadoCotizacion, CheckCliente, CheckDineroCliente
-        });
-
-        await newCotizacion.save();
-
-        const objResp = {
-            respCotizacion: newCotizacion,
-            resp: true,
-            message: 'Creación de cotización con éxito'
-        }
-
-        return res.status(200).json(objResp);
-    }
-    catch (error) {
-
-        const objResp = {
-            respCotizacion: null,
-            resp: false,
-            message: error.message
-        }
-
-        return res.status(400).json(objResp);
-    }
-
-
-
-
-});
-
-
 //#region Material
 router.post('/crearMaterial', async (req, res) => {
 
@@ -98,6 +49,7 @@ router.get('/AllMateriales', (req, res) => {
         console.log(err)
     });
 });
+
 router.post('/MaterialById', (req, res) => {
     const { nombreMaterial } = req.body;
 
@@ -107,6 +59,7 @@ router.post('/MaterialById', (req, res) => {
         console.log(err)
     });
 });
+
 router.put('/actualizarMaterial', (req, res) => {
 
     const { _id, nombreMaterial, material, largo_m, ancho_m, grm_m2, costo_sinIva_Rollo, costoAnteriorFront, nombreAsesor } = req.body;
@@ -149,10 +102,26 @@ router.put('/actualizarMaterial', (req, res) => {
     );
 
 });
+
+router.delete('/eliminarMaterial',async (req, res) => {
+    const { _id } = req.body;
+
+    const result = await Material.findByIdAndDelete(_id);
+
+    if (result) {
+        console.log(`Material con _id ${_id} eliminado correctamente.`);
+        return res.status(200).json({ success: true });
+    } else {
+        console.log(`No se encontró ningún material con _id ${_id}.`);
+        return res.status(404).json({ error: 'Material no encontrado' });
+    }
+
+});
 //#endregion Material
 
-const Impresion = require('../models/Impresion');
 //#region Impresion 
+const Impresion = require('../models/Impresion');
+
 router.post('/crearImpresion', async (req, res) => {
     const { nombreImpresion, costoImpresion } = req.body;
     const newImpresion = new Impresion({ nombreImpresion, costoImpresion });
@@ -184,6 +153,8 @@ router.put('/actualizarImpresion', (req, res) => {
 
     const { _id, nombreImpresion, costoImpresion } = req.body;
 
+    console.log(_id)
+
     Impresion.updateOne(
         { _id: _id },
         {
@@ -201,11 +172,25 @@ router.put('/actualizarImpresion', (req, res) => {
 
 });
 
+router.delete('/eliminarImpresion',async (req, res) => {
+    const { _id } = req.body;
+
+    const result = await Impresion.findByIdAndDelete(_id);
+
+    if (result) {
+        console.log(`Impresion con _id ${_id} eliminado correctamente.`);
+        return res.status(200).json({ success: true });
+    } else {
+        console.log(`No se encontró ningún Impresion con _id ${_id}.`);
+        return res.status(404).json({ error: 'Impresion no encontrado' });
+    }
+
+});
+
 //#endregion Impresion
 
-const Confeccion = require('../models/Confeccion');
-
 //#region Confeccion
+const Confeccion = require('../models/Confeccion');
 
 router.post('/crearConfeccion', async (req, res) => {
     const { nombreConfeccion, costoConfeccion } = req.body;
@@ -227,9 +212,9 @@ router.get('/AllConfecciones', (req, res) => {
 
 router.post('/ConfeccionById', (req, res) => {
 
-    const { nombreConfeccion } = req.body;
+    const { _id } = req.body;
 
-    Confeccion.findOne({ nombreConfeccion: nombreConfeccion }).then((result) => {
+    Confeccion.findOne({ _id: _id }).then((result) => {
         res.status(200).json(result)
     }).catch((err) => {
         console.log(err)
@@ -239,6 +224,8 @@ router.post('/ConfeccionById', (req, res) => {
 router.put('/actualizarConfeccion', (req, res) => {
 
     const { _id, nombreConfeccion, costoConfeccion } = req.body;
+
+    console.log(_id)
 
     Confeccion.updateOne(
         { _id: _id },
@@ -257,10 +244,26 @@ router.put('/actualizarConfeccion', (req, res) => {
 
 });
 
+router.delete('/eliminarConfeccion',async (req, res) =>{
+
+    const {_id} = req.body;
+
+    const result = await Confeccion.findByIdAndDelete(_id);
+
+    if (result) {
+        console.log(`Confeccion con _id ${_id} eliminado correctamente.`);
+        return res.status(200).json({ success: true });
+    } else {
+        console.log(`No se encontró ningún Confeccion con _id ${_id}.`);
+        return res.status(404).json({ error: 'Confeccion no encontrado' });
+    }
+
+});
+
 //#endregion Confeccion
 
-const Cordon = require('../models/Cordon');
 //#region Cordon
+const Cordon = require('../models/Cordon');
 
 router.post('/crearCordon', async (req, res) => {
     const { nombreCordon, largoRollo, valorRollo, valorMetro } = req.body;
@@ -302,12 +305,23 @@ router.put('/actualizarCordon', (req, res) => {
 
 });
 
+router.delete('/eliminarCordon',async (req, res) => {
+    const {_id} = req.body;
 
+    const result = await Cordon.findByIdAndDelete(_id);
+   
+    if (result) {
+        console.log(`Cordon con _id ${_id} eliminado correctamente.`);
+        return res.status(200).json({ success: true });
+    } else {
+        console.log(`No se encontró ningún Cordon con _id ${_id}.`);
+        return res.status(404).json({ error: 'Cordon no encontrado' });
+    }
+});
 //#endregion Cordon
 
 //#region Cogedera
 const Cogedera = require('../models/Cogedera');
-const Cotizaciones = require('../models/Cotizaciones');
 
 router.post('/crearCogedera', async (req, res) => {
     const { nombreCogedera, costoCogedera } = req.body;
@@ -327,9 +341,9 @@ router.get('/AllCogederas', (req, res) => {
 });
 
 router.post('/CogederaById', (req, res) => {
-    const { nombreCogedera } = req.body;
+    const { _id } = req.body;
 
-    Cogedera.findOne({ nombreCogedera: nombreCogedera }).then((result) => {
+    Cogedera.findOne({ _id: _id }).then((result) => {
         res.status(200).json(result)
     }).catch((err) => {
         console.log(err)
@@ -357,10 +371,67 @@ router.put('/actualizarCogedera', (req, res) => {
 
 });
 
+router.delete('/eliminarCogedera',async (req, res) => {
+    const {_id} = req.body;
+
+    const result = await Cogedera.findByIdAndDelete(_id);
+   
+    if (result) {
+        console.log(`Cogedera con _id ${_id} eliminado correctamente.`);
+        return res.status(200).json({ success: true });
+    } else {
+        console.log(`No se encontró ningún Cogedera con _id ${_id}.`);
+        return res.status(404).json({ error: 'Cogedera no encontrado' });
+    }
+});
 //#endregion Cogedera
 
-
 //#region Cotizador
+const Cotizaciones = require('../models/Cotizaciones');
+
+router.post('/CrearCotizacion', async (req, res) => {
+
+    try {
+
+        const { NombreEmpresa, NombreContacto, Identificacion, TelContacto,
+            Email, FechaEntrega, Ciudad, DireccionEntrega,
+            TipoCogedera, TipoBolsa, UnidadesRequeridas, Ancho_cm,
+            Alto_cm, Fuelle_cm, Asas_cm, Material, Color, Estampado,
+            Caras, NumeroTintas, ColorTintas, ValorBolsa, Utilidad, PVSinIvaUnitario, PVSinIvaTotal,
+            PVConIvaUnitario, PVConIvaTotal, NombreUsuario, _IdUsuario, _EstadoCotizacion, CheckCliente, CheckDineroCliente
+        } = req.body;
+
+        const newCotizacion = new Cotizaciones({
+            NombreEmpresa, NombreContacto, Identificacion, TelContacto,
+            Email, FechaEntrega, Ciudad, DireccionEntrega,
+            TipoCogedera, TipoBolsa, UnidadesRequeridas, Ancho_cm,
+            Alto_cm, Fuelle_cm, Asas_cm, Material, Color, Estampado,
+            Caras, NumeroTintas, ColorTintas, ValorBolsa, Utilidad, PVSinIvaUnitario, PVSinIvaTotal,
+            PVConIvaUnitario, PVConIvaTotal, NombreUsuario, _IdUsuario, _EstadoCotizacion, CheckCliente, CheckDineroCliente
+        });
+
+        await newCotizacion.save();
+
+        const objResp = {
+            respCotizacion: newCotizacion,
+            resp: true,
+            message: 'Creación de cotización con éxito'
+        }
+
+        return res.status(200).json(objResp);
+    }
+    catch (error) {
+
+        const objResp = {
+            respCotizacion: null,
+            resp: false,
+            message: error.message
+        }
+
+        return res.status(400).json(objResp);
+    }
+});
+
 router.post('/Cotizar', async (req, res) => {
 
     const MaterialMongoose = require('../models/Material');
@@ -597,8 +668,6 @@ function redondearAlDecimo(numero) {
 //#endregion Cotizador
 
 //#region MisSolicitudes
-
-
 router.post('/MisCotizaciones', (req, res) => {
     const { idUser, statusCotizacion } = req.body;
 
@@ -677,6 +746,5 @@ router.post('/ActualizarMiCotizacion', (req, res) => {
 
 
 //#endregion MisSolicitudes
-
 
 module.exports = router;
