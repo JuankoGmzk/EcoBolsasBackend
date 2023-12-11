@@ -1,0 +1,5 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/5174f87e-5d39-4cb4-b47e-b5d9135d1226/resourceGroups/MongoEco/providers/Microsoft.Web/sites/EcoBackend",
+    "appService.deploySubpath": ".",
+    "appService.showBuildDuringDeployPrompt": false
+}
