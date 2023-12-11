@@ -7,6 +7,17 @@ const Cotizador = require('../models/Cotizaciones');
 const HistoricoMateriales = require('../models/HistoricoMateriales');
 
 //#region Material
+router.post('/crearUnMaterial', async (req, res) => {
+
+    const { nombreMaterial, material, largo_m, ancho_m, grm_m2, Mtr_Detal, costo_sinIva_Rollo } = req.body;
+
+    const newTask = new Material({ nombreMaterial, material, largo_m, ancho_m, grm_m2, Mtr_Detal, costo_sinIva_Rollo });
+
+    await newTask.save();
+
+    return res.status(200).json({ message: req.body.length + ' Datos guardados exitosamente' });
+});
+
 router.post('/crearMaterial', async (req, res) => {
 
     for (let i = 0; i < req.body.length; i++) {
@@ -48,6 +59,10 @@ router.get('/AllMateriales', (req, res) => {
     }).catch((err) => {
         console.log(err)
     });
+});
+
+router.get('/TestJPBAzure', (req, res) => {
+    res.status(200).json({message: "respuesta del back si funciona"})
 });
 
 router.post('/MaterialById', (req, res) => {
@@ -103,8 +118,12 @@ router.put('/actualizarMaterial', (req, res) => {
 
 });
 
-router.delete('/eliminarMaterial',async (req, res) => {
+router.post('/eliminarMaterial',async (req, res) => {
+
+    console.log(req.body)
     const { _id } = req.body;
+
+    console.log(_id)
 
     const result = await Material.findByIdAndDelete(_id);
 
@@ -113,7 +132,7 @@ router.delete('/eliminarMaterial',async (req, res) => {
         return res.status(200).json({ success: true });
     } else {
         console.log(`No se encontró ningún material con _id ${_id}.`);
-        return res.status(404).json({ error: 'Material no encontrado' });
+        return res.status(406).json({ error: 'Material no encontrado', message:`No se encontró ningún material con _id ${_id}.`});
     }
 
 });
@@ -172,7 +191,7 @@ router.put('/actualizarImpresion', (req, res) => {
 
 });
 
-router.delete('/eliminarImpresion',async (req, res) => {
+router.post('/eliminarImpresion',async (req, res) => {
     const { _id } = req.body;
 
     const result = await Impresion.findByIdAndDelete(_id);
@@ -244,10 +263,12 @@ router.put('/actualizarConfeccion', (req, res) => {
 
 });
 
-router.delete('/eliminarConfeccion',async (req, res) =>{
+router.post('/eliminarConfeccion',async (req, res) =>{
 
+    console.log("entro")
     const {_id} = req.body;
 
+    console.log(req.body)
     const result = await Confeccion.findByIdAndDelete(_id);
 
     if (result) {
@@ -305,7 +326,7 @@ router.put('/actualizarCordon', (req, res) => {
 
 });
 
-router.delete('/eliminarCordon',async (req, res) => {
+router.post('/eliminarCordon',async (req, res) => {
     const {_id} = req.body;
 
     const result = await Cordon.findByIdAndDelete(_id);
@@ -371,7 +392,7 @@ router.put('/actualizarCogedera', (req, res) => {
 
 });
 
-router.delete('/eliminarCogedera',async (req, res) => {
+router.post('/eliminarCogedera',async (req, res) => {
     const {_id} = req.body;
 
     const result = await Cogedera.findByIdAndDelete(_id);
