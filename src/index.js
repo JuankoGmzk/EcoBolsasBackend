@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 
 require('./database');
-
+//SCM_DO_BUILD_DURING_DEPLOYMENT
 // settings
 app.set('port', process.env.PORT || 4000)
 
@@ -30,7 +30,7 @@ const server = app.listen(app.get('port'), () => {
 //WebSockets
 const io = require('socket.io')(server, {
     cors: {
-        origins: ['http://localhost:4200']
+        origins: ['*']
     }
 });
 
