@@ -4,8 +4,9 @@ mongoose.set('strictQuery', true);
 
 
 //mongodb://127.0.0.1/EcoBolsasDev
-mongoose.connect('mongodb://ecocosmos:mfK6LvEvG1AcI2qDPhFaMKV4kQtbcU6Ykg9In8zzpNYoiMbs90LkKs1WsUWW1UPgzijAJGFwbDIgACDbjIbdYg==@ecocosmos.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@ecocosmos@', {
+//mongoose.connect('mongodb://ecocosmos:mfK6LvEvG1AcI2qDPhFaMKV4kQtbcU6Ykg9In8zzpNYoiMbs90LkKs1WsUWW1UPgzijAJGFwbDIgACDbjIbdYg==@ecocosmos.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@ecocosmos@', {
 //mongoose.connect('mongodb://127.0.0.1/EcoBolsasDev', {
+mongoose.connect('mongodb+srv://juan:123@cluster0.f2jb1an.mongodb.net/',{
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(db => {
